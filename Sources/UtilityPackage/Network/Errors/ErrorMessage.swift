@@ -6,3 +6,11 @@
 //
 
 import Foundation
+
+public struct ErrorMessage {
+    static let genericError = "Something went wrong please try again later"
+    static let noInternetError = "ther's no internet"
+    static let fetchingError = "Error with fetching data"
+    static let responseError = "Unexpected response"
+    
+}

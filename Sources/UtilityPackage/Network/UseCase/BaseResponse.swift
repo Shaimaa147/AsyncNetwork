@@ -6,3 +6,13 @@
 //
 
 import Foundation
+
+public class BaseResponse<T: Codable>: Codable {
+    var status: String?
+    var data: T?
+    
+    enum CodingKeys: String, CodingKey {
+        case status = "status"
+        case data = "data"
+    }
+}

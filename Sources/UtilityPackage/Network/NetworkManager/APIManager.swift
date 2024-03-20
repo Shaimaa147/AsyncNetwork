@@ -6,3 +6,54 @@
 //
 
 import Foundation
+
+public class APIManager: NetworkManagerProtocol {
+    
+    public static let shared = APIManager()
+        
+    private init() {}
+    public func perform<T: Codable>(apiRequest: APIRequestProtocol,
+                             providerType: APIRequestProviderProtocol,
+                             outputType: T.Type) -> Void {
+        return call(providerType: providerType, outputType: T.self, apiRequest: apiRequest)
+    }
+    
+    private func call<T: Codable>(providerType: APIRequestProviderProtocol,
+                                  outputType: T.Type,
+                                  apiRequest: APIRequestProtocol) -> Void {
+        
+        providerType.handle(apiRequest: apiRequest, completion: { [weak self] result in
+            if let result = self?.validate(result: result, outputType: outputType) {
+                switch result {
+                case .success(let data):
+                    print("DATA INSIDE APIMANAGER ////\(data)")
+                   
+                case .failure(let error):
+                    print("ERROR INSIDE APIMANAGER ////\(error)")
+                }
+            }
+        })
+    }
+    
+    
+    private func validate<T: Codable>(result: Result<Data, NSError>,
+                                      outputType: T.Type )-> Result<[T], NSError> {
+        
+        let returnedresult: Result<[T], NSError>
+        
+        switch result {
+        case .failure(let error):
+            returnedresult = .failure(error)
+            
+        case .success(let data):
+            let dataString = String(data: data, encoding: .utf8)
+            print(dataString)
+            let jsonDecoder = JSONDecoder()
+            let parsedData = try! jsonDecoder.decode([T].self, from: data)
+            returnedresult = .success(parsedData)
+            
+        }
+        return returnedresult
+    }
+    
+}

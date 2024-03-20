@@ -6,3 +6,8 @@
 //
 
 import Foundation
+
+public protocol APIRequestProviderProtocol {
+    typealias APIRequestCompletion = (_ result: Result<Data, NSError>) -> Void
+    func handle(apiRequest: APIRequestProtocol, completion: @escaping APIRequestCompletion)
+}

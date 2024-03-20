@@ -8,6 +8,6 @@
 
 import Foundation
 
-protocol InternetManagerProtocol: class {
+public protocol InternetManagerProtocol: class {
     func  isInternetConnectionAvailable () -> Bool
 }
