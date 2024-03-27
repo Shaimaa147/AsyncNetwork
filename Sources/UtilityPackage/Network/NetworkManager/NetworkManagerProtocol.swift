@@ -10,5 +10,5 @@ import Foundation
 public protocol NetworkManagerProtocol: AnyObject {
     func perform<T: Codable>(apiRequest: APIRequestProtocol,
                              providerType: APIRequestProviderProtocol,
-                             outputType: T.Type) -> Void
+                             outputType: T.Type) async -> [T]
 }

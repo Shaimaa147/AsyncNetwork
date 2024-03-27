@@ -9,12 +9,10 @@ import Foundation
 
 open class BaseAPIRequest: APIRequestProtocol {
     public var baseURL: String
-    
+//    public var task: Task
+
     public var path: String
-    
     public var method: HTTPMethod
-    
-    public var task: Task
     
     public var headers: [String : String]?
     
@@ -25,7 +23,7 @@ open class BaseAPIRequest: APIRequestProtocol {
         path = ""
         method = .get
         headers = ["Content-Type": "application/json"]
-        task = .requestPlain
+//        task = .requestPlain
     }
     
     

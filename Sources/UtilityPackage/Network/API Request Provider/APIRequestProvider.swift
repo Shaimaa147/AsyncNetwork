@@ -15,32 +15,32 @@ public class APIRequestProvider: NSObject, APIRequestProviderProtocol {
         self.internetManager = internetManager
     }
     
-    public func handle(apiRequest: APIRequestProtocol, completion: @escaping APIRequestCompletion) {
+    public func handle(apiRequest: APIRequestProtocol) async throws -> Data {
         guard internetManager.isInternetConnectionAvailable() else {
-            let error = NSError(domain: apiRequest.baseURL, code: 0, userInfo: [NSLocalizedDescriptionKey: ErrorMessage.noInternetError])
-            completion(Result<Data, NSError>.failure(error))
-            return
+            throw NetworkError.noInternet
         }
         
-        if let url = URL(string: apiRequest.baseURL + apiRequest.path) {
-            URLSession.shared.dataTask(with: url) { (data, response, error) in
-                if error != nil {
-                    // print(error!)
-                    let error = NSError(domain: apiRequest.baseURL, code: 0, userInfo: [NSLocalizedDescriptionKey: ErrorMessage.fetchingError])
-                    completion(.failure(error))
-                    return
-                }
-                guard let httpResponse = response as? HTTPURLResponse,
-                      (200...299).contains(httpResponse.statusCode) else {
-                    print("Error with the response, unexpected status code: \(String(describing: response))")
-                    let error = NSError(domain: apiRequest.baseURL, code: 0, userInfo: [NSLocalizedDescriptionKey: ErrorMessage.responseError])
-                    completion(.failure(error))
-                    return
-                }
-                if let safeData = data {
-                    completion(Result<Data, NSError>.success(safeData))
-                }
-            }.resume()
+        guard let url = URL(string: apiRequest.baseURL + apiRequest.path) else {
+            throw NetworkError.invalidUrl
+        }
+        do {
+            let (data, response) = try await URLSession.shared.data(from: url)
+            
+            guard let httpResponse = response as? HTTPURLResponse,
+                  (200...299).contains(httpResponse.statusCode) else {
+                throw NetworkError.invalidResponse
+            }
+            
+            do {
+                
+                return data
+                
+            } catch {
+                throw NetworkError.invalidData
+            }
+            
+        } catch {
+            throw NetworkError.requestFailed
         }
     }
 }
